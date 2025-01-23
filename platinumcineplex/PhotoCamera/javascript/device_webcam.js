@@ -1,4 +1,6 @@
 class Webcam {
+    #newstart;
+
     constructor(custom = false, number = 1, label = '', settings = null) {
         this.device = {
             number: number,
@@ -9,10 +11,8 @@ class Webcam {
         this.stream = null;
         this.canvas = null;
         this.button = {
-            position: { x: 0.5, y: 0.8 }, radius: 0.2, tapped: false,
             timer: new Timer(3),
-            push: this.#push.bind(this),
-            pull: this.#pull.bind(this),
+            press: this.#press.bind(this),
         };
         this.settings = settings ||
         {
@@ -27,12 +27,11 @@ class Webcam {
                 }
             },
             audio: false
-        }
-        this.newstart = true;
+        };
         this.prepared = false;
         this.captured = false;
+        this.#newstart = true;
 
-        this.maskIndex = 0;
         this.#presetup();
     }
 
@@ -108,24 +107,16 @@ class Webcam {
         target_canvas.textFont(file.content.font.Figtree.Bold);
 
         if (this.button.timer.end()) {
-            circle(pos.x * width, pos.y * height, rad * minWin * (tap ? 0.64 : 0.8));
-            noFill();
-            stroke(255, opacity);
-            strokeWeight(rad * minWin * 0.125);
-            circle(pos.x * width, pos.y * height, rad * minWin);
 
             if (!this.captured) {
-                if (!this.newstart) {
+                if (!this.#newstart) {
                     this.stream.stop();
                     this.captured = true;
                     console.log('Webcam captured:', this.captured);
                 }
             } else {
-                noStroke();
-                fill(255);
-                textSize(minWin * 0.0625 + pulse);
-                text('NEXT', width * 0.75, pos.y * height);
             }
+
         } else {
             pulse = cos(this.button.timer.counterDown * TAU) * 16;
             fill(255);
@@ -139,29 +130,12 @@ class Webcam {
         if (this.prepared) this.canvas.resizeCanvas(w, h);
     }
 
-    #push() {
-        const minWin = min(width, height);
-        const { position, radius, tapped } = this.button;
-
-        if (!tapped && dist(mouseX, mouseY, position.x * width, position.y * height) <= radius * minWin * 0.5) {
-            this.button.tapped = true;
-            console.log('Button tapped');
-        } else {
-            this.maskIndex = (this.maskIndex + 1) % 4;
-        }
-    }
-
-    #pull() {
-        const minWin = min(width, height);
-        const { position, radius, tapped } = this.button;
-
-        if (tapped && dist(mouseX, mouseY, position.x * width, position.y * height) <= radius * minWin * 0.5) {
+    #press() {
+        if (this.#newstart) this.#newstart = false;
+        if (this.captured) {
             this.stream.play();
-            this.button.timer.start();
             this.captured = false;
-            console.log('New start: ', this.newstart, 'Webcam captured:', this.captured);
-            this.newstart = false;
         }
-        this.button.tapped = false;
+        this.button.timer.start();
     }
 }

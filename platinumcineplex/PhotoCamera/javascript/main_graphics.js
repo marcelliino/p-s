@@ -68,7 +68,7 @@ function draw() {
         h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125)
     };
 
-    scene.start.current.opacity = lerp(scene.start.current.opacity, scene.start.target.opacity, 0.125);
+    scene.start.current.opacity = lerp(scene.start.current.opacity, scene.start.target.opacity, 0.5);
 
     //--------------------//
 
@@ -107,8 +107,9 @@ function draw() {
     file.tracker.update(
         file.counter,
         null,
-        !inout.webcam.prepared ? fract(scene.runtime)
-        : inout.webcam.button.tapped ? 1 : 0.5
+        !inout.webcam.prepared
+        ? fract(scene.runtime)
+        : (scene.tap ? 1 : 0.5)
     );
     file.tracker.display.bar(
         scene.bar.current.x, scene.bar.current.y,

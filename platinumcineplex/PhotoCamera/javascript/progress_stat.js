@@ -16,14 +16,14 @@ class ProgressStat {
         };
     }
 
-    update(loaded, smoothFactor = 0.125, time = millis() / 500) {
+    update(loaded, smoothFactor = 0.125, time = millis() / 1000) {
         loaded = max(0, loaded);
         smoothFactor = min(1, max(0, smoothFactor || 0.125));
 
         this.current = Math.min(loaded, this.total);
         this.smoothed = lerp(this.smoothed, this.current, smoothFactor);
         this.#progress = this.smoothed / this.total;
-        this.#pulse = cos(time * PI) / 2.0 + 0.5;
+        this.#pulse = cos(time * TAU) / 2.0 + 0.5;
     }
 
     #displayBar(x, y, length, thickness = length / 16) {

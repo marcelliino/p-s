@@ -39,10 +39,7 @@ function draw() {
         scene.bar.target.y = height / 1.25;
         scene.bar.target.h = scene.minWin * 0.2;
         scene.bar.target.w = scene.bar.target.h;
-        scene.bar.target.time = 1;
         scene.panel.target.y = -height;
-    } else {
-        scene.bar.target.time = fract(scene.runtime);
     }
 
     scene.panel.current = {
@@ -68,8 +65,7 @@ function draw() {
         x: lerp(scene.bar.current.x, scene.bar.target.x, 0.125),
         y: lerp(scene.bar.current.y, scene.bar.target.y, 0.0625),
         w: lerp(scene.bar.current.w, scene.bar.target.w, 0.125),
-        h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125),
-        time: lerp(scene.bar.current.time, scene.bar.target.time, 0.125)
+        h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125)
     };
 
     scene.start.current.opacity = lerp(scene.start.current.opacity, scene.start.target.opacity, 0.125);
@@ -111,7 +107,8 @@ function draw() {
     file.tracker.update(
         file.counter,
         null,
-        scene.bar.current.time
+        !inout.webcam.prepared ? fract(scene.runtime)
+        : inout.webcam.button.tapped ? 1 : 0.5
     );
     file.tracker.display.bar(
         scene.bar.current.x, scene.bar.current.y,

@@ -1,6 +1,7 @@
 function draw() {
     background('#5C16C1');
     scene.minWin = min(width, height);
+    scene.runtime = millis() / 1000;
 
 
     scene.panel.target = { x: 0, y: 0, w: width, h: height };
@@ -19,7 +20,6 @@ function draw() {
     };
 
     scene.start.target.opacity = 0;
-
     scene.title.target = { x: width / 0.5, y: scene.logo.target.y, opacity: 0 };
 
     if (!file.loading) {
@@ -35,8 +35,14 @@ function draw() {
     }
 
     if (inout.webcam.prepared) {
-        scene.bar.target.y = height * 1.25;
+        scene.start.target.opacity = 0;
+        scene.bar.target.y = height / 1.25;
+        scene.bar.target.h = scene.minWin * 0.2;
+        scene.bar.target.w = scene.bar.target.h;
+        scene.bar.target.time = 1;
         scene.panel.target.y = -height;
+    } else {
+        scene.bar.target.time = fract(scene.runtime);
     }
 
     scene.panel.current = {
@@ -60,16 +66,17 @@ function draw() {
 
     scene.bar.current = {
         x: lerp(scene.bar.current.x, scene.bar.target.x, 0.125),
-        y: lerp(scene.bar.current.y, scene.bar.target.y, 0.125),
+        y: lerp(scene.bar.current.y, scene.bar.target.y, 0.0625),
         w: lerp(scene.bar.current.w, scene.bar.target.w, 0.125),
-        h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125)
+        h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125),
+        time: lerp(scene.bar.current.time, scene.bar.target.time, 0.125)
     };
 
     scene.start.current.opacity = lerp(scene.start.current.opacity, scene.start.target.opacity, 0.125);
 
     //--------------------//
 
-    inout.webcam.render(scene.graphic);
+    inout.webcam.render(this);
 
     push();
     noStroke();
@@ -80,9 +87,7 @@ function draw() {
         scene.panel.current.w,
         scene.panel.current.h
     );
-    pop();
 
-    push();
     imageMode(CENTER);
     if (file.content.splash.logo) image(file.content.splash.logo,
         scene.logo.current.x, scene.logo.current.y,
@@ -91,6 +96,7 @@ function draw() {
         file.content.splash.logo.width, file.content.splash.logo.height,
         CONTAIN
     );
+
     tint(255, scene.title.current.opacity);
     image(
         file.content.splash.title,
@@ -102,7 +108,11 @@ function draw() {
     );
     pop();
 
-    file.tracker.update(file.counter);
+    file.tracker.update(
+        file.counter,
+        null,
+        scene.bar.current.time
+    );
     file.tracker.display.bar(
         scene.bar.current.x, scene.bar.current.y,
         scene.bar.current.w, scene.bar.current.h

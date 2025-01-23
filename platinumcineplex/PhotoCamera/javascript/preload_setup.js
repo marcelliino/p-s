@@ -55,7 +55,8 @@ function setup() {
             w: width / 2,
             h: width / 32,
             x: width / 2,
-            y: height / 1.5
+            y: height / 1.5,
+            time: 0
         },
         current: {}
     };

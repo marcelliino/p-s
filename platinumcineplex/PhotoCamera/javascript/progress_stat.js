@@ -16,14 +16,14 @@ class ProgressStat {
         };
     }
 
-    update(loaded, smoothFactor = 0.125) {
+    update(loaded, smoothFactor = 0.125, time = millis() / 500) {
         loaded = max(0, loaded);
-        smoothFactor = min(1, max(0, smoothFactor));
+        smoothFactor = min(1, max(0, smoothFactor || 0.125));
 
         this.current = Math.min(loaded, this.total);
         this.smoothed = lerp(this.smoothed, this.current, smoothFactor);
         this.#progress = this.smoothed / this.total;
-        this.#pulse = cos(millis() / 500 * PI) / 2.0 + 0.5;
+        this.#pulse = cos(time * PI) / 2.0 + 0.5;
     }
 
     #displayBar(x, y, length, thickness = length / 16) {
@@ -32,7 +32,7 @@ class ProgressStat {
         translate(x - length / 2, y - thickness / 2);
 
         noStroke();
-        fill(lerpColor('#E54C00', '#FFAB57', this.#pulse));
+        fill(lerpColor(color('#E54C00'), color('#FFAB57'), this.#pulse));
         rect(-thickness / 8, -thickness / 8,
             length + thickness / 4, thickness / 0.8,
             thickness / 1.25);
@@ -51,7 +51,7 @@ class ProgressStat {
         noFill();
 
         strokeWeight(thickness / 0.8);
-        stroke(lerpColor('#E54C00', '#FFAB57', this.#pulse));
+        stroke(lerpColor(color('#E54C00'), color('#FFAB57'), this.#pulse));
         ellipse(x, y, diameter);
 
         strokeWeight(thickness);
@@ -64,7 +64,7 @@ class ProgressStat {
         const percentage = floor(this.#progress * 100);
 
         push();
-        fill(lerpColor('#E54C00', '#FFAB57', this.#pulse));
+        fill(lerpColor(color('#E54C00'), color('#FFAB57'), this.#pulse));
         noStroke();
         text(`${percentage}%`, x, y);
         pop();
@@ -72,7 +72,7 @@ class ProgressStat {
 
     #displayCounter(x, y) {
         push();
-        fill(lerpColor('#E54C00', '#FFAB57', this.#pulse));
+        fill(lerpColor(color('#E54C00'), color('#FFAB57'), this.#pulse));
         noStroke();
         text(`${floor(this.current)}/${this.total}`, x, y);
         pop();

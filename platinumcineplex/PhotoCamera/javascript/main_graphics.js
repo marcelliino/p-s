@@ -39,7 +39,7 @@ function draw() {
         scene.bar.target.y = height / 1.25;
         scene.bar.target.h = scene.minWin * 0.2;
         scene.bar.target.w = scene.bar.target.h;
-        scene.panel.target.y = -height;
+        scene.panel.target.y = height;
     }
 
     scene.panel.current = {

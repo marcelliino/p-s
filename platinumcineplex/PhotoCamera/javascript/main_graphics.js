@@ -22,6 +22,8 @@ function draw() {
     scene.start.target.opacity = 0;
     scene.title.target = { x: width / 0.5, y: scene.logo.target.y, opacity: 0 };
 
+    let label = 'Mulai Foto';
+
     if (!file.loading) {
         scene.logo.target.s = scene.minWin / 4;
         scene.logo.target.x = scene.logo.target.s / 2;
@@ -40,6 +42,12 @@ function draw() {
         scene.bar.target.h = scene.minWin * 0.2;
         scene.bar.target.w = scene.bar.target.h;
         scene.panel.target.y = height;
+        if (inout.webcam.captured) {
+            scene.bar.target.y = height / 1.5;
+            scene.bar.target.h = width / 16;
+            scene.bar.target.w = width / 4;
+            if (abs(scene.bar.current.w - scene.bar.target.w) / scene.bar.target.w < 0.0625) scene.start.target.opacity = 255;
+        }
     }
 
     scene.panel.current = {
@@ -68,7 +76,11 @@ function draw() {
         h: lerp(scene.bar.current.h, scene.bar.target.h, 0.125)
     };
 
-    scene.start.current.opacity = lerp(scene.start.current.opacity, scene.start.target.opacity, 0.5);
+    scene.start.current.opacity = lerp(
+        scene.start.current.opacity,
+        scene.start.target.opacity,
+        0.5
+    );
 
     //--------------------//
 
@@ -108,8 +120,8 @@ function draw() {
         file.counter,
         null,
         !inout.webcam.prepared
-        ? fract(scene.runtime)
-        : (scene.tap ? 1 : 0.5)
+            ? fract(scene.runtime)
+            : (scene.tap ? 1 : 0.5)
     );
     file.tracker.display.bar(
         scene.bar.current.x, scene.bar.current.y,
@@ -120,9 +132,15 @@ function draw() {
     textFont(file.content.font.Figtree.Bold, scene.bar.current.h / 2);
     noStroke();
 
+    if (!inout.webcam.newstart) label = 'Foto Ulang';
+    if (inout.webcam.prepared && !inout.webcam.button.timer.end()) {
+        label = floor(inout.webcam.button.timer.counterDown + 0.5);
+        scene.start.target.opacity = 255;
+    }
+
     textAlign(CENTER, CENTER);
     fill(255, scene.start.current.opacity);
-    text('Mulai Foto', scene.bar.current.x, scene.bar.current.y);
+    text(label, scene.bar.current.x, scene.bar.current.y);
     pop();
 
 }

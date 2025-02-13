@@ -1,5 +1,5 @@
 class Webcam {
-    #newstart;
+    #flash;
 
     constructor(custom = false, number = 1, label = '', settings = null) {
         this.device = {
@@ -30,7 +30,8 @@ class Webcam {
         };
         this.prepared = false;
         this.captured = false;
-        this.#newstart = true;
+        this.newstart = true;
+        this.#flash = 0;
 
         this.#presetup();
     }
@@ -109,20 +110,26 @@ class Webcam {
         if (this.button.timer.end()) {
 
             if (!this.captured) {
-                if (!this.#newstart) {
+                if (!this.newstart) {
                     this.stream.stop();
+                    this.#flash = 255;
                     this.captured = true;
                     console.log('Webcam captured:', this.captured);
                 }
             } else {
+                target_canvas.text('next', width * 0.5, height * 0.5);
             }
 
         } else {
             pulse = cos(this.button.timer.counterDown * TAU) * 16;
-            fill(255);
-            textSize(minWin * 0.25 + pulse);
-            text(floor(this.button.timer.counterDown + 0.5), width * 0.5, height * 0.5);
+            target_canvas.fill(255);
+            target_canvas.textSize(minWin * 0.25 + pulse);
+            target_canvas.text(floor(this.button.timer.counterDown + 0.5), width * 0.5, height * 0.5);
         }
+
+        this.#flash = max(this.#flash - 16, 0);
+        target_canvas.fill(255, this.#flash);
+        target_canvas.rect(0, 0, width, height);
 
     }
 
@@ -131,7 +138,7 @@ class Webcam {
     }
 
     #press() {
-        if (this.#newstart) this.#newstart = false;
+        if (this.newstart) this.newstart = false;
         if (this.captured) {
             this.stream.play();
             this.captured = false;
